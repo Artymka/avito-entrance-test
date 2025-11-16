@@ -46,21 +46,23 @@ func TestTables(t *testing.T) {
 
 	t.Run("Creating records test", func(t *testing.T) {
 		user := models.User{
+			ID:       "123",
 			Name:     "john",
 			IsActive: true,
 			TeamID:   "123",
 		}
 		err = usersRepo.Create(&user)
 		require.Nil(t, err)
-		t.Logf("user id: %d", user.ID)
+		t.Logf("user id: %s", user.ID)
 
 		pr := models.PullRequest{
+			ID:       "321",
 			Name:     "smth",
 			AuthorID: "123",
 			Status:   "OPEN",
 		}
 		err = prRepo.Create(pr)
 		require.Nil(t, err)
-		t.Logf("pr id: %d", pr.ID)
+		t.Logf("pr id: %s", pr.ID)
 	})
 }

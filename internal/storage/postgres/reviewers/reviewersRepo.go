@@ -55,7 +55,7 @@ func (r *ReviewersRepo) GetCandidates(authorID string, limit int) ([]models.User
 	const op = "postgres.reviewers_repo.get_candidates"
 
 	res := make([]models.User, 0, 2)
-	err := r.db.Select(res, `
+	err := r.db.Select(&res, `
 		SELECT users.id, users.name, users.team_id, users.is_active
 		FROM users
 		CROSS JOIN (SELECT id, team_id FROM users WHERE id = $1) AS auth

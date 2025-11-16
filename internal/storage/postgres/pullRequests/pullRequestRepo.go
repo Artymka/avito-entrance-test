@@ -41,7 +41,7 @@ func (r *PullRequestsRepo) createTable() error {
 			name VARCHAR(255) NOT NULL,
 			author_id VARCHAR(255) NOT NULL,
 			status pull_request_status NOT NULL DEFAULT 'OPEN',
-			FOREIGN KEY (authour_id) REFERENCES users(id)
+			FOREIGN KEY (author_id) REFERENCES users(id)
 		)
 	`)
 
@@ -66,7 +66,7 @@ func (r *PullRequestsRepo) Create(pr models.PullRequest) error {
 			case "23505": // unique_violation
 				return fmt.Errorf("%s: %w", op, storage.ErrUnique)
 			case "23503": // foreign_key_violation
-				return fmt.Errorf("referenced entity does not exist")
+				return fmt.Errorf("%s: %w", op, storage.ErrForeignKey)
 			default:
 				return fmt.Errorf("%s: %w", op, err)
 			}

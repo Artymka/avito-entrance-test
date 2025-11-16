@@ -19,7 +19,7 @@ func New(pr repos.PullRequestsRepo, re repos.ReviewersRepo) http.HandlerFunc {
 		const op = "handlers.pull_request.create"
 		// json check
 		var req schemas.PRCreateRequest
-		if err := render.DecodeJSON(r.Body, req); err != nil {
+		if err := render.DecodeJSON(r.Body, &req); err != nil {
 			logging.Err(op, err)
 			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, response.Err(response.CodeBadRequest, ""))

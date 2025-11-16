@@ -25,7 +25,7 @@ func (r *TeamsRepo) createTable() error {
 	const op = "postgres.teams_repo.create_table"
 	_, err := r.db.Exec(`
 		CREATE TABLE IF NOT EXISTS teams (
-			id SERIAL PRIMARY KEY,
+			id VARCHAR(255) PRIMARY KEY,
 			name VARCHAR(255) NOT NULL
 		)
 	`)
