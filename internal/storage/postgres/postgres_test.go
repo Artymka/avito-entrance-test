@@ -49,9 +49,9 @@ func TestTables(t *testing.T) {
 			ID:       "123",
 			Name:     "john",
 			IsActive: true,
-			TeamID:   "123",
+			TeamName: "123",
 		}
-		err = usersRepo.Create(&user)
+		err = usersRepo.Create(user)
 		require.Nil(t, err)
 		t.Logf("user id: %s", user.ID)
 

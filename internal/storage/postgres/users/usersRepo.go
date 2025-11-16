@@ -1,11 +1,13 @@
 package users
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Artymka/avito-entrance-test/internal/storage"
 	"github.com/Artymka/avito-entrance-test/internal/storage/models"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type UsersRepo struct {
@@ -48,7 +50,15 @@ func (r *UsersRepo) Create(user models.User) error {
 	`, user.ID, user.Name, user.TeamName, user.IsActive)
 
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			switch pqErr.Code {
+			case "23505": // unique_violation
+				return fmt.Errorf("%s: %w", op, storage.ErrUnique)
+			default:
+				return fmt.Errorf("%s: %w", op, err)
+			}
+		}
 	}
 	return nil
 }
@@ -56,9 +66,9 @@ func (r *UsersRepo) Create(user models.User) error {
 func (r *UsersRepo) Update(user models.User) error {
 	const op = "postgres.users_repo.update"
 	res, err := r.db.Exec(`
-		UPDATE TABLE users
-		SET name = $1
-			team_name = $2
+		UPDATE users
+		SET name = $1,
+			team_name = $2,
 			is_active = $3
 		WHERE id = $4
 	`, user.Name, user.TeamName, user.IsActive, user.ID)

@@ -1,10 +1,13 @@
 package teams
 
 import (
+	"errors"
 	"fmt"
 
+	"github.com/Artymka/avito-entrance-test/internal/storage"
 	"github.com/Artymka/avito-entrance-test/internal/storage/models"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type TeamsRepo struct {
@@ -44,7 +47,15 @@ func (r *TeamsRepo) Create(team models.Team) error {
 	`, team.Name)
 
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			switch pqErr.Code {
+			case "23505": // unique_violation
+				return fmt.Errorf("%s: %w", op, storage.ErrUnique)
+			default:
+				return fmt.Errorf("%s: %w", op, err)
+			}
+		}
 	}
 	return nil
 }
