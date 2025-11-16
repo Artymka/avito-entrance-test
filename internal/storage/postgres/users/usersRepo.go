@@ -1,6 +1,7 @@
 package users
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -85,4 +86,61 @@ func (r *UsersRepo) Update(user models.User) error {
 	}
 
 	return nil
+}
+
+func (r *UsersRepo) SetIsActive(user models.User) error {
+	const op = "postgres.users_repo.set_is_active"
+	res, err := r.db.Exec(`
+		UPDATE users
+		SET is_active = $1
+		WHERE id = $2
+	`, user.IsActive, user.ID)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	if rows != 1 {
+		return fmt.Errorf("%s: %w", op, storage.ErrWrongUpadtes)
+	}
+
+	return nil
+}
+
+func (r *UsersRepo) Exists(userID string) (bool, error) {
+	const op = "postgres.users_repo.exists"
+
+	var res bool
+	err := r.db.Get(&res, `
+		SELECT EXISTS (SELECT 1 FROM users WHERE id = $1)
+	`, userID)
+
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return res, nil
+}
+
+func (r *UsersRepo) Get(userID string) (models.User, error) {
+	const op = "postgres.users_repo.get"
+
+	var res models.User
+	err := r.db.Get(&res, `
+		SELECT id, name, team_name, is_active
+		FROM users 
+		WHERE id = $1
+	`, userID)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return res, fmt.Errorf("%s: %w", op, storage.ErrNoRows)
+		}
+		return res, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return res, nil
 }
