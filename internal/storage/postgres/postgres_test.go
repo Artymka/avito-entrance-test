@@ -48,7 +48,7 @@ func TestTables(t *testing.T) {
 		user := models.User{
 			Name:     "john",
 			IsActive: true,
-			TeamID:   123,
+			TeamID:   "123",
 		}
 		err = usersRepo.Create(&user)
 		require.Nil(t, err)
@@ -56,10 +56,10 @@ func TestTables(t *testing.T) {
 
 		pr := models.PullRequest{
 			Name:     "smth",
-			AuthorID: 123,
+			AuthorID: "123",
 			Status:   "OPEN",
 		}
-		err = prRepo.Create(&pr)
+		err = prRepo.Create(pr)
 		require.Nil(t, err)
 		t.Logf("pr id: %d", pr.ID)
 	})

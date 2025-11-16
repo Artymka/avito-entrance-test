@@ -9,6 +9,10 @@ import (
 )
 
 type Config struct {
+	Server struct {
+		Address string `yaml:"address" validate:"required"`
+	} `yaml:"server"`
+
 	Postgres struct {
 		Host     string `yaml:"host" validate:"required"`
 		Port     string `yaml:"port" validate:"required"`

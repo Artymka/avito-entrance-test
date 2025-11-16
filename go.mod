@@ -3,6 +3,9 @@ module github.com/Artymka/avito-entrance-test
 go 1.25.1
 
 require (
+	github.com/go-chi/chi v1.5.5
+	github.com/go-chi/chi/v5 v5.2.3
+	github.com/go-chi/render v1.0.3
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
@@ -11,6 +14,7 @@ require (
 )
 
 require (
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect

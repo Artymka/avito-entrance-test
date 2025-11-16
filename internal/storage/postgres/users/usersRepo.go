@@ -25,7 +25,7 @@ func (r *UsersRepo) createTable() error {
 	const op = "postgres.users_repo.create_table"
 	_, err := r.db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
-			id SERIAL PRIMARY KEY,
+			id VARCHAR(255) PRIMARY KEY,
 			name VARCHAR(255) NOT NULL,
 			team_id INTEGER NOT NULL,
 			is_acitve BOOLEAN NOT NULL DEFAULT false
@@ -42,10 +42,10 @@ func (r *UsersRepo) Create(user *models.User) error {
 	const op = "postgres.users_repo.create"
 	err := r.db.Get(&user.ID, `
 		INSERT INTO users
-		(name, team_id, is_acitve)
-		VALUES ($1, $2, $3)
+		(id, name, team_id, is_acitve)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id
-	`, user.Name, user.TeamID, user.IsActive)
+	`, user.ID, user.Name, user.TeamID, user.IsActive)
 
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
