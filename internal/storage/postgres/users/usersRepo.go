@@ -144,3 +144,22 @@ func (r *UsersRepo) Get(userID string) (models.User, error) {
 
 	return res, nil
 }
+
+func (r *UsersRepo) GetReview(userID string) ([]models.PullRequest, error) {
+	const op = "postgres.users_repo.get_review"
+
+	res := make([]models.PullRequest, 0)
+	err := r.db.Select(&res, `
+		SELECT pull_requests.id, pull_requests.name, pull_requests.author_id, pull_requests.status
+		FROM reviewers
+		LEFT JOIN pull_requests
+		ON reviewers.pull_request_id = pull_requests.id
+		WHERE reviewers.user_id = $1
+	`, userID)
+
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return res, nil
+}

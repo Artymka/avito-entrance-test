@@ -9,7 +9,8 @@ import (
 	pullRequestReassign "github.com/Artymka/avito-entrance-test/internal/handlers/pullRequest/reassign"
 	teamAdd "github.com/Artymka/avito-entrance-test/internal/handlers/team/add"
 	teamGet "github.com/Artymka/avito-entrance-test/internal/handlers/team/get"
-	userSetIsActive "github.com/Artymka/avito-entrance-test/internal/handlers/users/setIsActive"
+	usersGetReview "github.com/Artymka/avito-entrance-test/internal/handlers/users/getReview"
+	usersSetIsActive "github.com/Artymka/avito-entrance-test/internal/handlers/users/setIsActive"
 	"github.com/Artymka/avito-entrance-test/internal/lib/logging"
 	"github.com/Artymka/avito-entrance-test/internal/storage/postgres"
 	pullrequests "github.com/Artymka/avito-entrance-test/internal/storage/postgres/pullRequests"
@@ -52,7 +53,8 @@ func main() {
 	r := chi.NewRouter()
 	r.Post("/team/add", teamAdd.New(teamsRepo, usersRepo))
 	r.Get("/team/get", teamGet.New(teamsRepo))
-	r.Post("/users/setIsActive", userSetIsActive.New(usersRepo))
+	r.Post("/users/setIsActive", usersSetIsActive.New(usersRepo))
+	r.Get("/users/getReview", usersGetReview.New(usersRepo))
 	r.Post("/pullRequest/create", pullRequestCreate.New(prRepo, reviewersRepo))
 	r.Post("/pullRequest/merge", pullRequestMerge.New(prRepo, reviewersRepo))
 	r.Post("/pullRequest/reassign", pullRequestReassign.New(prRepo, reviewersRepo, usersRepo))

@@ -35,20 +35,18 @@ func New(pr repos.PullRequestsRepo, re repos.ReviewersRepo) http.HandlerFunc {
 		})
 		if err != nil {
 			if errors.Is(err, storage.ErrUnique) {
-				logging.Err(op, err)
 				w.WriteHeader(http.StatusConflict)
 				render.JSON(w, r, response.Err(response.CodePRExists, "PR id already exists"))
 				return
 			}
 			if errors.Is(err, storage.ErrForeignKey) {
-				logging.Err(op, err)
 				w.WriteHeader(http.StatusNotFound)
 				render.JSON(w, r, response.Err(response.CodeNotFound, ""))
 				return
 			}
 			logging.Err(op, err)
-			w.WriteHeader(http.StatusBadRequest)
-			render.JSON(w, r, response.Err(response.CodeBadRequest, ""))
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, response.Err(response.CodeServer, ""))
 			return
 		}
 

@@ -8,4 +8,5 @@ type UsersRepo interface {
 	SetIsActive(user models.User) error
 	Exists(userID string) (bool, error)
 	Get(userID string) (models.User, error)
+	GetReview(userID string) ([]models.PullRequest, error)
 }

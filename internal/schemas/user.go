@@ -15,3 +15,8 @@ type User struct {
 type UserRsponse struct {
 	User User `json:"user"`
 }
+
+type UserReviewResponse struct {
+	UserID string    `json:"user_id"`
+	PRs    []PRShort `json:"pull_requests"`
+}
