@@ -59,3 +59,35 @@ func (r *TeamsRepo) Create(team models.Team) error {
 	}
 	return nil
 }
+
+func (r *TeamsRepo) Exists(team models.Team) (bool, error) {
+	const op = "postgres.teams_repo.exists"
+
+	var res bool
+	err := r.db.Get(&res, `
+		SELECT EXISTS (SELECT 1 FROM teams WHERE name = $1)
+	`, team.Name)
+
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return res, nil
+}
+
+func (r *TeamsRepo) GetMembers(team models.Team) ([]models.User, error) {
+	const op = "postgres.teams_repo.get_members"
+
+	res := make([]models.User, 0)
+	err := r.db.Select(&res, `
+		SELECT id, name, is_active
+		FROM users
+		WHERE team_name = $1
+	`, team.Name)
+
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return res, nil
+}
