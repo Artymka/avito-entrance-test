@@ -10,4 +10,6 @@ func Info(op string, msg string) {
 	log.Printf("INFO %s: %s", op, msg)
 }
 
-func Debug() {}
+func Debug(op string, msg string) {
+	log.Printf("DEBUG %s: %s", op, msg)
+}

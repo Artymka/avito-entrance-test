@@ -17,6 +17,7 @@ import (
 func New(pr repos.PullRequestsRepo, re repos.ReviewersRepo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.pull_request.create"
+
 		// json check
 		var req schemas.PRCreateRequest
 		if err := render.DecodeJSON(r.Body, &req); err != nil {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Artymka/avito-entrance-test/internal/config"
 	pullRequestCreate "github.com/Artymka/avito-entrance-test/internal/handlers/pullRequest/create"
+	pullRequestMerge "github.com/Artymka/avito-entrance-test/internal/handlers/pullRequest/merge"
 	teamAdd "github.com/Artymka/avito-entrance-test/internal/handlers/team/add"
 	teamGet "github.com/Artymka/avito-entrance-test/internal/handlers/team/get"
 	userSetIsActive "github.com/Artymka/avito-entrance-test/internal/handlers/users/setIsActive"
@@ -48,10 +49,11 @@ func main() {
 
 	// router
 	r := chi.NewRouter()
-	r.Post("/pullRequest/create", pullRequestCreate.New(prRepo, reviewersRepo))
 	r.Post("/team/add", teamAdd.New(teamsRepo, usersRepo))
 	r.Get("/team/get", teamGet.New(teamsRepo))
 	r.Post("/users/setIsActive", userSetIsActive.New(usersRepo))
+	r.Post("/pullRequest/create", pullRequestCreate.New(prRepo, reviewersRepo))
+	r.Post("/pullRequest/merge", pullRequestMerge.New(prRepo, reviewersRepo))
 
 	// listen
 	logging.Info("main", "server is listenning...")

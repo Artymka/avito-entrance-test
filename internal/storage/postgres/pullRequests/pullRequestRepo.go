@@ -1,8 +1,10 @@
 package pullrequests
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/Artymka/avito-entrance-test/internal/storage"
 	"github.com/Artymka/avito-entrance-test/internal/storage/models"
@@ -41,6 +43,7 @@ func (r *PullRequestsRepo) createTable() error {
 			name VARCHAR(255) NOT NULL,
 			author_id VARCHAR(255) NOT NULL,
 			status pull_request_status NOT NULL DEFAULT 'OPEN',
+			merged_at TIMESTAMP NULL,
 			FOREIGN KEY (author_id) REFERENCES users(id)
 		)
 	`)
@@ -74,4 +77,40 @@ func (r *PullRequestsRepo) Create(pr models.PullRequest) error {
 	}
 
 	return nil
+}
+
+func (r *PullRequestsRepo) Merge(id string, mergedAt time.Time) error {
+	const op = "postgres.pull_requests_repo.merge"
+	_, err := r.db.Exec(`
+		UPDATE pull_requests
+		SET merged_at = $1,
+			status = 'MERGED'
+		WHERE id = $2
+	`, mergedAt, id)
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (r *PullRequestsRepo) Get(id string) (models.PullRequest, error) {
+	const op = "postgres.pull_requests_repo.get"
+
+	var res models.PullRequest
+	err := r.db.Get(&res, `
+		SELECT id, name, author_id, status, merged_at 
+		FROM pull_requests
+		WHERE id = $1
+	`, id)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return res, fmt.Errorf("%s: %w", op, storage.ErrNoRows)
+		}
+		return res, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return res, nil
 }

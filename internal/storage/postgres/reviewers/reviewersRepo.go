@@ -71,3 +71,22 @@ func (r *ReviewersRepo) GetCandidates(authorID string, limit int) ([]models.User
 
 	return res, nil
 }
+
+func (r *ReviewersRepo) Get(pullRequestID string) ([]models.User, error) {
+	const op = "postgres.reviewers_repo.get"
+
+	res := make([]models.User, 0, 2)
+	err := r.db.Select(&res, `
+		SELECT users.id, users.name, users.team_name, users.is_active
+		FROM users
+		JOIN reviewers
+		ON users.id = reviewers.user_id
+		WHERE reviewers.pull_request_id = $1
+	`, pullRequestID)
+
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return res, nil
+}
