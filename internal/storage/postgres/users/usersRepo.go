@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 
+	"github.com/Artymka/avito-entrance-test/internal/storage"
 	"github.com/Artymka/avito-entrance-test/internal/storage/models"
 	"github.com/jmoiron/sqlx"
 )
@@ -27,7 +28,7 @@ func (r *UsersRepo) createTable() error {
 		CREATE TABLE IF NOT EXISTS users (
 			id VARCHAR(255) PRIMARY KEY,
 			name VARCHAR(255) NOT NULL,
-			team_id VARCHAR(255) NOT NULL,
+			team_name VARCHAR(255) NOT NULL,
 			is_active BOOLEAN NOT NULL DEFAULT false
 		)
 	`)
@@ -38,17 +39,40 @@ func (r *UsersRepo) createTable() error {
 	return nil
 }
 
-func (r *UsersRepo) Create(user *models.User) error {
+func (r *UsersRepo) Create(user models.User) error {
 	const op = "postgres.users_repo.create"
-	err := r.db.Get(&user.ID, `
+	_, err := r.db.Exec(`
 		INSERT INTO users
-		(id, name, team_id, is_active)
+		(id, name, team_name, is_active)
 		VALUES ($1, $2, $3, $4)
-		RETURNING id
-	`, user.ID, user.Name, user.TeamID, user.IsActive)
+	`, user.ID, user.Name, user.TeamName, user.IsActive)
 
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
+	return nil
+}
+
+func (r *UsersRepo) Update(user models.User) error {
+	const op = "postgres.users_repo.update"
+	res, err := r.db.Exec(`
+		UPDATE TABLE users
+		SET name = $1
+			team_name = $2
+			is_active = $3
+		WHERE id = $4
+	`, user.Name, user.TeamName, user.IsActive, user.ID)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	if rows != 1 {
+		return fmt.Errorf("%s: %w", op, storage.ErrWrongUpadtes)
+	}
+
 	return nil
 }

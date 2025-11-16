@@ -58,10 +58,10 @@ func (r *ReviewersRepo) GetCandidates(authorID string, limit int) ([]models.User
 	err := r.db.Select(&res, `
 		SELECT users.id, users.name, users.team_id, users.is_active
 		FROM users
-		CROSS JOIN (SELECT id, team_id FROM users WHERE id = $1) AS auth
-		WHERE users.team_id = auth.team_id
+		CROSS JOIN (SELECT id, team_id FROM users WHERE id = $1) AS author
+		WHERE users.team_name = author.team_name
 			AND users.is_active = true
-			AND users.id <> auth.id
+			AND users.id <> author.id
 		LIMIT $2
 	`, authorID, limit)
 

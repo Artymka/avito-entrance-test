@@ -5,6 +5,7 @@ import (
 
 	"github.com/Artymka/avito-entrance-test/internal/config"
 	pullRequestCreate "github.com/Artymka/avito-entrance-test/internal/handlers/pullRequest/create"
+	teamAdd "github.com/Artymka/avito-entrance-test/internal/handlers/team/add"
 	"github.com/Artymka/avito-entrance-test/internal/lib/logging"
 	"github.com/Artymka/avito-entrance-test/internal/storage/postgres"
 	pullrequests "github.com/Artymka/avito-entrance-test/internal/storage/postgres/pullRequests"
@@ -26,26 +27,27 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	_, err = users.New(p.DB)
+	usersRepo, err := users.New(p.DB)
 	if err != nil {
 		panic(err)
 	}
-	_, err = teams.New(p.DB)
+	teamsRepo, err := teams.New(p.DB)
 	if err != nil {
 		panic(err)
 	}
-	pullRequests, err := pullrequests.New(p.DB)
+	prRepo, err := pullrequests.New(p.DB)
 	if err != nil {
 		panic(err)
 	}
-	reviewers, err := reviewers.New(p.DB)
+	reviewersRepo, err := reviewers.New(p.DB)
 	if err != nil {
 		panic(err)
 	}
 
 	// router
 	r := chi.NewRouter()
-	r.Post("/pullRequest/create", pullRequestCreate.New(pullRequests, reviewers))
+	r.Post("/pullRequest/create", pullRequestCreate.New(prRepo, reviewersRepo))
+	r.Post("/team/add", teamAdd.New(teamsRepo, usersRepo))
 
 	// listen
 	logging.Info("main", "server is listenning...")

@@ -25,8 +25,7 @@ func (r *TeamsRepo) createTable() error {
 	const op = "postgres.teams_repo.create_table"
 	_, err := r.db.Exec(`
 		CREATE TABLE IF NOT EXISTS teams (
-			id VARCHAR(255) PRIMARY KEY,
-			name VARCHAR(255) NOT NULL
+			name VARCHAR(255) PRIMARY KEY
 		)
 	`)
 
@@ -36,13 +35,12 @@ func (r *TeamsRepo) createTable() error {
 	return nil
 }
 
-func (r *TeamsRepo) Create(team *models.Team) error {
+func (r *TeamsRepo) Create(team models.Team) error {
 	const op = "postgres.teams_repo.create"
-	err := r.db.Get(&team.ID, `
+	_, err := r.db.Exec(`
 		INSERT INTO teams
 		(name)
 		VALUES ($1)
-		RETURNING id
 	`, team.Name)
 
 	if err != nil {
