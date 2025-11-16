@@ -53,7 +53,7 @@ func New(pr repos.PullRequestsRepo, re repos.ReviewersRepo) http.HandlerFunc {
 		}
 
 		// assign reviewers
-		candidates, err := re.GetCandidates(req.AuthorID, 2)
+		candidates, err := re.GetCandidates(req.AuthorID, req.ID, 2)
 		if err != nil {
 			logging.Err(op, err)
 			w.WriteHeader(http.StatusInternalServerError)

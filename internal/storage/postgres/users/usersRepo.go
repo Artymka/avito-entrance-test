@@ -115,7 +115,7 @@ func (r *UsersRepo) Exists(userID string) (bool, error) {
 
 	var res bool
 	err := r.db.Get(&res, `
-		SELECT EXISTS (SELECT 1 FROM users WHERE id = $1)
+		SELECT EXISTS (SELECT 1 FROM users WHERE id = $1 LIMIT 1)
 	`, userID)
 
 	if err != nil {

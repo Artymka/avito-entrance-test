@@ -6,6 +6,7 @@ import (
 	"github.com/Artymka/avito-entrance-test/internal/config"
 	pullRequestCreate "github.com/Artymka/avito-entrance-test/internal/handlers/pullRequest/create"
 	pullRequestMerge "github.com/Artymka/avito-entrance-test/internal/handlers/pullRequest/merge"
+	pullRequestReassign "github.com/Artymka/avito-entrance-test/internal/handlers/pullRequest/reassign"
 	teamAdd "github.com/Artymka/avito-entrance-test/internal/handlers/team/add"
 	teamGet "github.com/Artymka/avito-entrance-test/internal/handlers/team/get"
 	userSetIsActive "github.com/Artymka/avito-entrance-test/internal/handlers/users/setIsActive"
@@ -54,6 +55,7 @@ func main() {
 	r.Post("/users/setIsActive", userSetIsActive.New(usersRepo))
 	r.Post("/pullRequest/create", pullRequestCreate.New(prRepo, reviewersRepo))
 	r.Post("/pullRequest/merge", pullRequestMerge.New(prRepo, reviewersRepo))
+	r.Post("/pullRequest/reassign", pullRequestReassign.New(prRepo, reviewersRepo, usersRepo))
 
 	// listen
 	logging.Info("main", "server is listenning...")

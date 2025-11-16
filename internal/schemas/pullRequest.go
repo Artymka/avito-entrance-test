@@ -34,3 +34,13 @@ type PRMerge struct {
 	AssignedReviwers []string `json:"assigned_reviewers"`
 	MergedAt         string   `json:"mergedAt"`
 }
+
+type PRReassignRequest struct {
+	PRID   string `json:"pull_request_id"`
+	UserID string `json:"old_user_id"`
+}
+
+type PRReassignResponse struct {
+	PR         PRResponse `json:"pr"`
+	ReplacedBy string     `json:"replaced_by"`
+}

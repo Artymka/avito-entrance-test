@@ -51,7 +51,7 @@ func (r *ReviewersRepo) Create(reviewer models.Reviewer) error {
 	return nil
 }
 
-func (r *ReviewersRepo) GetCandidates(authorID string, limit int) ([]models.User, error) {
+func (r *ReviewersRepo) GetCandidates(authorID string, PRID string, limit int) ([]models.User, error) {
 	const op = "postgres.reviewers_repo.get_candidates"
 
 	res := make([]models.User, 0, 2)
@@ -62,8 +62,13 @@ func (r *ReviewersRepo) GetCandidates(authorID string, limit int) ([]models.User
 		WHERE users.team_name = author.team_name
 			AND users.is_active = true
 			AND users.id <> author.id
-		LIMIT $2
-	`, authorID, limit)
+			AND NOT EXISTS (
+				SELECT 1 FROM reviewers 
+				WHERE reviewers.user_id = users.id 
+				AND reviewers.pull_request_id = $2
+			)
+		LIMIT $3
+	`, authorID, PRID, limit)
 
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
@@ -89,4 +94,37 @@ func (r *ReviewersRepo) Get(pullRequestID string) ([]models.User, error) {
 	}
 
 	return res, nil
+}
+
+func (r *ReviewersRepo) Has(reviewer models.Reviewer) (bool, error) {
+	const op = "postgres.reviewers_repo.has"
+
+	var has bool
+	err := r.db.Get(&has, `
+		SELECT EXISTS (
+			SELECT 1 FROM reviewers 
+			WHERE user_id = $1 AND pull_request_id = $2
+		)
+	`, reviewer.UserID, reviewer.PullRequestID)
+
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return has, nil
+}
+
+func (r *ReviewersRepo) Delete(reviewer models.Reviewer) error {
+	const op = "postgres.reviewers_repo.delete"
+
+	_, err := r.db.Exec(`
+		DELETE FROM reviewers
+		WHERE user_id = $1 AND pull_request_id = $2
+	`, reviewer.UserID, reviewer.PullRequestID)
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
 }
